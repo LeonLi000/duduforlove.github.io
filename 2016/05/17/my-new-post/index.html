@@ -1,0 +1,718 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Architecture," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="前言这是一个老生常谈的话题，也是一个纷乱繁复的话题，我尝试着去找到一个恰当的切入点，我发现我找不到，因为这个话题他可以写一本书，他包含的知识点真的太多太多，我情不自禁的梳理了一遍，却发现我渐渐学习和掌握的每一个知识点，正好对应了这个时代网站架构的变迁。 
+网站架构为什么会发生变迁？当网站提供的服务满足不了用户需求的时候，我们就需要做出改变。怎么去改变，从用户体验角度看，我们不可能强制限制用户的需求">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊一聊大型网站架构设计">
+<meta property="og:url" content="http://www.duduforlove.com/2016/05/17/my-new-post/index.html">
+<meta property="og:site_name" content="DuduForLove">
+<meta property="og:description" content="前言这是一个老生常谈的话题，也是一个纷乱繁复的话题，我尝试着去找到一个恰当的切入点，我发现我找不到，因为这个话题他可以写一本书，他包含的知识点真的太多太多，我情不自禁的梳理了一遍，却发现我渐渐学习和掌握的每一个知识点，正好对应了这个时代网站架构的变迁。 
+网站架构为什么会发生变迁？当网站提供的服务满足不了用户需求的时候，我们就需要做出改变。怎么去改变，从用户体验角度看，我们不可能强制限制用户的需求">
+<meta property="og:updated_time" content="2016-05-17T13:49:13.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="聊一聊大型网站架构设计">
+<meta name="twitter:description" content="前言这是一个老生常谈的话题，也是一个纷乱繁复的话题，我尝试着去找到一个恰当的切入点，我发现我找不到，因为这个话题他可以写一本书，他包含的知识点真的太多太多，我情不自禁的梳理了一遍，却发现我渐渐学习和掌握的每一个知识点，正好对应了这个时代网站架构的变迁。 
+网站架构为什么会发生变迁？当网站提供的服务满足不了用户需求的时候，我们就需要做出改变。怎么去改变，从用户体验角度看，我们不可能强制限制用户的需求">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 聊一聊大型网站架构设计 | DuduForLove </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">DuduForLove</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                聊一聊大型网站架构设计
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-17T11:22:51+08:00" content="2016-05-17">
+              2016-05-17
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这是一个老生常谈的话题，也是一个纷乱繁复的话题，我尝试着去找到一个恰当的切入点，我发现我找不到，因为这个话题他可以写一本书，他包含的知识点真的太多太多，我情不自禁的梳理了一遍，却发现我渐渐学习和掌握的每一个知识点，正好对应了这个时代网站架构的变迁。 </p>
+<p>网站架构为什么会发生变迁？当网站提供的服务满足不了用户需求的时候，我们就需要做出改变。怎么去改变，从用户体验角度看，我们不可能强制限制用户的需求，只能通过提升我们提供的服务来满足日益增长的用户。所以，<strong><code>网站架构发生变迁的根本都源于用户需求的不断增加</code></strong>。<a id="more"></a></p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>本文从不同用户需求的层次来剖析网站架构的变迁。</p>
+<p>我们先从搭建一个简单的电商网站开始，假设初期的用户数很少，网站的uv只有100，pv只有1000，网站的业务也极其简单，这种情况下，网站是不用考虑任何的性能瓶颈的，我们可以用一个简单的web应用程式和一个数据库然后部署到一台单独的物理机器即可。</p>
+<h3 id="应用数据分离"><a href="#应用数据分离" class="headerlink" title="应用数据分离"></a>应用数据分离</h3><p>随着岁月的变迁，网站的用户数慢慢开始积累，网站的业务复杂度也慢慢开始增加，这时候我们发现一台物理机器处理用户请求的响应时间和cpu使用率开始增加，io吞吐量开始下降，这台物理机器的性能已经出现了瓶颈，我们需要提升物理服务器的性能，当然也可以增大物理内存增加cpu，但是这种方式并不能从根本上解决问题，我们一般会采用另一种方式，将应用服务器、数据库服务器、图片文件服务器分离，并根据各自服务器自身特性和用途来配置不同的硬件，来达到最好的性能效果。</p>
+<h3 id="服务器集群改善应用性能"><a href="#服务器集群改善应用性能" class="headerlink" title="服务器集群改善应用性能"></a>服务器集群改善应用性能</h3><p>服务器分离是一个好的开端，我们发现单台服务器解决不了的问题，可以通过多台服务器来协同解决，这样看来问题似乎就简洁清晰许多了。通常而言，某种物事在质量上的提升是比较困难的，但是如果能从数量上来改变从而达到质变的效果，那就会简单很多。就这样，集群的概念出现了。随着用户规模的不断扩大，单台应用服务器无法处理用户请求的时候，可以通过应用服务器集群来改善应用服务器的性能。其原理也非常简单，就是在应用服务器前面通过负载均衡调度用户请求，将用户请求分发到多个服务器节点上去。常用的负载均衡软件有LVS、nginx、HAProxy等，LVS分发路径优于nginx和HAProxy，性能会略高一些。使用应用服务器集群也需要考虑因为集群环境带来的一些问题，比如session的管理，多台服务器之间如何使session保持一致，目前主流的做法是使用基于cache存储的分布式session来实现session的共享。再比如分布式环境如何实现临界资源（同步互斥）的访问？在单机环境下，我们可以很方便的使用synchronized或者lock来实现临界资源的访问，但是分布式集群环境，这种方式就无效了，目前主流的做法是<a href="http://blog.arganzheng.me/posts/use-zookeeper-for-distribute-lock.html" target="_blank" rel="external">使用zookeeper来实现分布式锁</a>。在比如分布式系统难以解决却又非常重要的一个问题，分布式事务的挑战，我们往往并不是去直接保证分布式系统事务的强一致性，而是保证数据的最终一致性，换句话说，我们往往允许系统在非常短的时间内出现数据不一致的情况，我们只需要保证最终数据一致即可。除了以上非常常见的问题之外，分布式系统较之单机系统还会有非常的问题需要去解决，如果系统业务依赖时序，如何保证每个节点的时钟完全一致？分布式系统的提出，除了用于提升应用服务器性能之外，也保证了整个系统的可靠性，那么如何去避免出现单点故障？出现单点故障如何做到自动恢复等等。分布式系统极大的改善和提高了应用服务器的性能，但是较之单机系统也在一定程度上面增加了业务的复杂度，依稀还记得哪位大牛曾经说过，最好的分布式系统设计，就是尽量不要使用分布式。看似有点矛盾，有点装x，但是我觉得真正道出了分布式系统和单机系统设计取舍的一种平衡点。</p>
+<h3 id="数据库分库分表读写分离"><a href="#数据库分库分表读写分离" class="headerlink" title="数据库分库分表读写分离"></a>数据库分库分表读写分离</h3><p>应用服务器的性能瓶颈似乎看起来已经解决了，通过应用服务器集群来改善服务器的性能在不考虑业务复杂度的情况下是一个完美的解决方案。但是，对于整个系统来说，数据库访问同样面临着严重的性能问题。有了应用服务器集群的经验，我们很自然的想到数据库集群解决方案。Sharding并不是一门新的技术，只是跟应用服务器集群一样，从质量上无法提升单机数据库服务的性能时，可以通过sharding将请求分散到不同的数据库服务节点上去。Sharding的方式分水平切分和垂直切分。</p>
+<ol>
+<li>垂直分库，如果网站的业务都可以切分的足够独立，把不同业务的数据放到不同的数据库存储会是一个非常不错的方案，即使其中某个业务的数据库出现了问题，也不会影响到其他的业务的正常运行，看似是个非常不错的分库方案，但是在实际的生产环境下，业务之间或多或少总会有些关联，而且也不能解决单表数据暴涨的问题，所以在实际操作中除非业务之间彼此非常独立，否则我们往往会选择水平分库分表的方案。</li>
+<li>水平分库分表，水平分库分表是分布式系统最常见的数据库切分方式。通过水平分库分表以后，每个库的库表结构都不发生改变，我们假设分库分库分表之前，数据库用户表有一亿条记录，现在通过水平分为4个库，每个库分25张表，那么经过分库分表以后，新的数据库的用户表只会有(1亿/4/25=100w)100w条记录。分库分表的策略有很多种，最常见的就是根据主键id直接取模，然后散列到不同的库表中，当然分表的纬度也有很多种，并不一定会根据id取模，如果我们选择分表的纬度是用户名，因为用户名可能是字符串，就不能通过直接取模来进行散列，可以先hash然后再取模散列。水平分库分表可以很好的解决数据库访问的性能瓶颈，和分布式系统设计一样，也会大大增加业务系统的复杂度，下面就分库分表以后常见的一些问题来做阐述：<ul>
+<li><strong>分库分表以后如何生成全局唯一的主键id？</strong><br>单库单表情况下，我们通常直接采用自增长的方式来生成唯一的主键id，但是分库分表以后这种方式就不可用了。我们通常会用一个独立的应用程式来提供一个专门生成全局唯一id的服务，有兴趣的朋友可以参考<a href="https://github.com/twitter/snowflake" target="_blank" rel="external">Twitter的解决方案</a>。</li>
+<li><strong>假设用户表分库分表的方式是按照主键id取模的方式，怎样根据用户名或者手机号或者邮箱来查询用户？</strong><br>根据不同纬度来查询的问题，这个一般没有很好的解决方案，只能通过根据主表来建立纬度附属表（查询字段和主键id的映射表）来避免查询的时候扫库扫表。即，通过建立用户名或者手机号码或者邮箱与主键id的映射表，先通过映射表查询到主键id，然后根据主键id查询到具体的记录。</li>
+<li><strong>如果用户表分库分表的策略是按照主键id mod 4的方式，有一天，我们发现4个库不再够用了，要多增加一个库的时候怎么办？如果用id mod 5，我们会发现之前的数据都散列到了错误的库。</strong><br>解决这个问题可以考虑使用<a href="http://blog.csdn.net/sparkliang/article/details/5279393" target="_blank" rel="external">一致性hash算法</a>作为分库分表的策略，一致性hash是一个环形hash算法，增加或者删除任何节点，只会影响该节点上一个或者下一个节点之间的数据，这样就可以保证增加或者删除节点带来的数据迁移影响最小。当然现在阿里巴巴提供的<a href="https://www.aliyun.com/product/drds" target="_blank" rel="external">DRDS服务</a>已经可以支持自动化水平拆分，在线平滑扩缩容，透明读写分离等等。</li>
+<li><strong>分库分表以后联表查询变的艰难无比，分页排序都会变的非常复杂。</strong><br>水平分库分表以后做连表查询已经不可能了，只能放弃联合查询，通过多次子查询然后通过程序去内存中关联或者将相关信息存入缓存，每次更新数据库的时候同步更新缓存。分页排序的处理方式也是类似。</li>
+</ul>
+</li>
+</ol>
+<p>以上同样只是分库分表带来的诸多问题的冰山一角，跟应用服务器集群类似，既然享受到分库分表带给我们的诸多便利和性能上的极大改善，就得容忍它所有的瑕疵和缺陷。除了分库分表之外，还可以根据业务特性来做主从备份读写分离，因为往往用户80%以上的操作都是查询数据库的操作，所以我们可以采取一主多从，读写分离的方式来提升数据库的性能，用户的写操作依然访问主库，但是占据绝大多数部分的查询操作就可以通过访问多个从库来实现。对于海量的数据，频繁访问关系型数据库已经是下下策，对于海量数据的查询，可以使用内存数据库（mogodb）、redis缓存来存储，或者直接使用搜索引擎（solr、elasticsearch）来实现。</p>
+<h3 id="SOA和微服务架构"><a href="#SOA和微服务架构" class="headerlink" title="SOA和微服务架构"></a>SOA和微服务架构</h3><p>当我们采用了应用服务器集群和数据库集群以后，整个系统的稳定性和可靠性得到了质的提升，但是往往这时候我们会发现业务系统已经变得臃肿不堪，模块跟模块之间互相依赖，高度耦合，每次修正小的bug和增加新的功能，都会把整个系统在所有的应用服务器集群内部重新发布，并且应用启动的时间会越来越长，生产效率会受到极大的影响。这时候，我们应该会想到，需要对应用进行拆分了。</p>
+<p>就以本文中的电商网站为例，我们可以根据不同的业务对整个系统进行拆分，登录子系统（sso单点登录）、用户中心子系统、商品子系统、购物子系统、支付子系统、评论子系统、客服子系统等等，拆分以后的子系统作为单独的服务独立部署更新和迭代，各个子系统做好去中心化的负载均衡避免出现单点故障。这就是面向服务的架构，也就是本文中的SOA架构。微服务的模式跟SOA在我看来并没有本质上的区别，只是微服务乐于采用简单轻量的协议，比如rest，而不是ws，微服务的架构其实是一个不包含ws服务的SOA。微服务的有点是显而易见的，通过分解巨大单体式应用从而解决了复杂的业务带来的一系列的问题，单个服务非常容易开发维护和迭代更新，微服务可以独立部署，很多情况下即使坏掉，也不会影响整个业务系统。微服务的架构有很多值得探讨和思考的问题，比如服务注册和发现、服务治理、服务部署以及用合适的策略去分解一个巨大的单体应用等等。</p>
+<p>笔者接触微服务的时间并不长，但是有幸也在具体的项目中实施过。服务的注册发现以及服务治理采用的阿里开源的Dubbo框架。不得不说Dubbo是笔者目前为止使用过阿里巴巴开源出来最好的框架，没有之一。Dubbo可以通过服务管理和监控中心，在web界面上对所有的服务进行管理，包括服务之间的负载均衡、访问控制、权重调节、服务降级等等，对于集群容错、故障重试等都只需要配置重试策略即可，重试的过程对使用者透明。Dubbo可以跟Spring框架无缝集成，对于java开发者来说，配置开发极其方便。当然，Dubbo框架并不是一个跨语言的框架，它只能对基于java开发的服务进行服务管理和监控，如果构建服务是通过其他语言进行开发的，可以选择类似的产品比如<a href="https://github.com/Netflix/Hystrix" target="_blank" rel="external">Netflix Hystrix</a>。</p>
+<p>在架构变迁的历程中，技术的更替当然远远不止以上的变革，比如<strong>多级缓存、cdn技术、页面静态化、使用消息队列进行异步处理、数据仓库进行数据清洗转换、使用kafka、spark进行大数据实时计算和分析</strong>等等等等，总体说来构建一个复杂的应用真的很难，在设计之初我们需要尽可能的考虑到系统的可伸缩性，当然我们同时需要避免过度设计和重度设计带来的高成本，尽量使用一些优秀的框架，Stop Trying to Reinvent the Wheel！</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>今天是第一次写blog，既然写了，就想坚持下去，虽然感觉文笔枯燥不已，也并没有什么干货，但是毕竟是嘟嘟出品，hahaha，你懂的！希望大家能一起学习一起进步！</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Architecture/" rel="tag">#Architecture</a>
+          
+        </div>
+      
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="dudu" />
+          <p class="site-author-name" itemprop="name">dudu</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用数据分离"><span class="nav-number">2.1.</span> <span class="nav-text">应用数据分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器集群改善应用性能"><span class="nav-number">2.2.</span> <span class="nav-text">服务器集群改善应用性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库分库分表读写分离"><span class="nav-number">2.3.</span> <span class="nav-text">数据库分库分表读写分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SOA和微服务架构"><span class="nav-number">2.4.</span> <span class="nav-text">SOA和微服务架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">2.5.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dudu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  托管在 -
+  <a class="theme-link" href="https://github.com/duduforlove/duduforlove.github.io">
+    Github
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+
+  
+
+  
+
+</body>
+</html>
